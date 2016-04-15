@@ -30,12 +30,16 @@ sub handler {
 	my $r = shift;
 
 	my $domain = $r->headers_in->{'Host'} || 'UNKNOWN-HOST';
-	my $path = $r->unparsed_uri;
+
+	my $path_clean = $r->uri;
+	my $path_raw = $r->unparsed_uri;
 
 	$ENV{GodAuth_User} = '';
 
-	my $url = $domain . $path;
-	my $log = "$$ URL : $url";
+	my $url_clean = $domain . $path_clean;
+	my $url_raw = $domain . $path_raw;
+
+	my $log = "$$ URL : $url_clean";
 
 
 	#########################################################
@@ -68,7 +72,7 @@ sub handler {
 
 	for my $obj (@{$GodAuthConfig::PermMap}){
 
-		if ($url =~ $obj->{url}){
+		if ($url_clean =~ $obj->{url}){
 
 			$allow = $obj->{who};
 			last;
@@ -188,19 +192,19 @@ sub handler {
 	#
 
 	if (!$cookie){
-		return &redir($r, $url, $GodAuthConfig::FailNeedsAuth);
+		return &redir($r, $url_raw, $GodAuthConfig::FailNeedsAuth);
 	}
 
 	if ($cookie_is_old){
-		return &redir($r, $url, $GodAuthConfig::FailCookieOld);
+		return &redir($r, $url_raw, $GodAuthConfig::FailCookieOld);
 	}
 
 	if ($cookie_is_future){
-		return &redir($r, $url, $GodAuthConfig::FailCookieFuture);
+		return &redir($r, $url_raw, $GodAuthConfig::FailCookieFuture);
 	}
 
 	if (!$cookie_is_valid){
-		return &redir($r, $url, $GodAuthConfig::FailCookieInvalid);
+		return &redir($r, $url_raw, $GodAuthConfig::FailCookieInvalid);
 	}
 
 
@@ -250,7 +254,7 @@ sub handler {
 	# send the user to the not-on-list page
 	#
 
-	return &redir($r, $url, $GodAuthConfig::FailNotOnList);
+	return &redir($r, $url_raw, $GodAuthConfig::FailNotOnList);
 }
 
 ##############################################################################################################
