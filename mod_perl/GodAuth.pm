@@ -32,8 +32,6 @@ sub handler {
 	my $domain = $r->headers_in->{'Host'} || 'UNKNOWN-HOST';
 	my $path = $r->unparsed_uri;
 
-	my $host = hostname;
-
 	$ENV{GodAuth_User} = '';
 
 	my $url = $domain . $path;
